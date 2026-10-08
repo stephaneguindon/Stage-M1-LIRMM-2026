@@ -33,6 +33,8 @@ import matplotlib.pyplot as plt
 import argparse
 
 
+
+
 def faire_un_pas(x, y, m, n):
     """
     Déplace un marcheur d'un pas sur la grille.
@@ -50,23 +52,28 @@ def faire_un_pas(x, y, m, n):
     Retourne :
         x, y : nouvelle position du marcheur
     """
-    if np.random.rand() > m:
-        return x, y  # le marcheur reste sur place
+    # Liste de l'ensemble des noeuds vers lesquels il est possible de migrer, y compris ceux qui sont hors grille
+    candidats = []
+    candidats.append((x, y)) # rester sur place
+    candidats.append((x - 1, y)) # gauche
+    candidats.append((x + 1, y)) # droite
+    candidats.append((x, y - 1)) # bas
+    candidats.append((x, y + 1)) # haut
 
-    # On construit la liste des voisins valides selon la position (bords réfléchissants)
-    voisins = []
-    if x > 0:
-        voisins.append((x - 1, y)) # gauche
-    if x < n - 1:
-        voisins.append((x + 1, y)) # droite
-    if y > 0:
-        voisins.append((x, y - 1)) # bas
-    if y < n - 1:
-        voisins.append((x, y + 1)) # haut
+    # On tire un des candidats au hasard, selon le vecteur de probabilités [1-m, m/4, m/4, m/4, m/4]
+    probabilites = [1 - m, m / 4, m / 4, m / 4, m / 4]
+    idx = np.random.choice(len(candidats), p=probabilites)
+    x, y = candidats[idx]
 
-    # On choisit un voisin au hasard parmi ceux disponibles
-    idx = np.random.randint(len(voisins))
-    x, y = voisins[idx]
+    # Barrières réfléchissantes : on ne peut pas sortir de la grille
+    if(x == -1):
+        x = 0
+    if(x == n):
+        x = n - 1
+    if(y == -1):
+        y = 0
+    if(y == n): 
+        y = n - 1
 
     return x, y
 
